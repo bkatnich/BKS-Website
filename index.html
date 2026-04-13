@@ -30,7 +30,7 @@
             flex-direction: column;
             align-items: center;
             gap: 36px;
-            padding: 40px 24px;
+            padding: 120px 24px 100px;
         }
 
         .logo {
@@ -60,14 +60,112 @@
             letter-spacing: 0.06em;
             text-transform: uppercase;
         }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.35);
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #00e5ff;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 0.65rem;
+            letter-spacing: 0.06em;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-logo-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        .nav-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .contact-link {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .contact-link:hover {
+            color: #00e5ff;
+        }
     </style>
 </head>
 <body>
+    <nav>
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon"><img src="src/black_katt_transparent.png" alt="Black Katt Logo"></div>
+            Black Katt
+        </a>
+        <a href="mailto:britt@blackkatt.ca?subject=Black%20Katt%20%E2%80%94%20General%20Inquiry" class="contact-link">Contact Us</a>
+    </nav>
     <div class="container">
         <img class="logo" src="src/black_katt_transparent.png" alt="Black Katt Logo">
         <div class="divider"></div>
         <h1>Under Construction</h1>
         <p>Something great is coming soon</p>
     </div>
+    <footer>
+        <div class="footer-links">
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="terms-of-service.html">Terms of Service</a>
+        </div>
+        <p class="copyright">&copy; 2026 Black Katt Technologies Inc. All rights reserved. Black Katt&trade; is a trademark of Black Katt Technologies Inc.</p>
+    </footer>
 </body>
 </html>
