@@ -22,6 +22,7 @@ const errorMessages = {
     'auth/weak-password': 'Please choose a stronger password.',
     'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
     'auth/network-request-failed': 'Network error. Check your connection and try again.',
+    'auth/admin-restricted-operation': 'New sign-ups are not open yet.',
 };
 
 export function authErrorMessage(error) {
