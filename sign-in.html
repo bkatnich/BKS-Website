@@ -351,7 +351,7 @@
             <h1>Sign In</h1>
             <p class="subtitle">Welcome back</p>
         </div>
-        <form id="sign-in-form" novalidate>
+        <form id="sign-in-form" method="post" action="#" novalidate>
             <label class="field" for="email">
                 <span class="field-label">Email</span>
                 <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
@@ -372,7 +372,7 @@
                 <input id="remember" name="remember" type="checkbox">
                 Keep me signed in
             </label>
-            <button type="submit" class="submit">Sign In</button>
+            <button type="submit" class="submit" disabled>Sign In</button>
             <p class="form-message" role="status" aria-live="polite"></p>
         </form>
         <p class="switch">New to Black Katt? <a href="sign-up.html">Create an account</a></p>
@@ -384,7 +384,7 @@
         </div>
         <p class="copyright">&copy; 2026 Black Katt Technologies Inc. All rights reserved. Black Katt&trade; is a trademark of Black Katt Technologies Inc.</p>
     </footer>
-    <script type="module">
+    <script type="module" onerror="document.querySelector('.form-message').textContent = 'This form could not load. Check your connection or content blocker, then refresh.'">
         import {
             browserLocalPersistence,
             browserSessionPersistence,
@@ -467,6 +467,9 @@
                 showMessage(authErrorMessage(error));
             }
         });
+
+        // Only allow submitting once the handlers above are attached.
+        submit.disabled = false;
     </script>
 </body>
 </html>
