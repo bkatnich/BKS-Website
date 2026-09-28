@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Katt — Sign In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: #00e5ff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #7df3ff;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-logo:hover {
+            color: #fff;
+        }
+
+        .nav-logo-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        .nav-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .contact-link {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .contact-link:hover {
+            color: #00e5ff;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            padding: 48px 24px;
+        }
+
+        .logo {
+            width: 112px;
+            height: 112px;
+            object-fit: contain;
+        }
+
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: #00e5ff;
+        }
+
+        .heading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .subtitle {
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        form {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 8px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .label-row a {
+            font-size: 0.75rem;
+            letter-spacing: 0.06em;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            background: #0b0b0b;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 2px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00e5ff;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: #ff6b6b;
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .password-wrap input {
+            padding-right: 52px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.55);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover,
+        .toggle-password[aria-pressed="true"] {
+            color: #00e5ff;
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.65);
+            cursor: pointer;
+        }
+
+        .checkbox input {
+            width: 16px;
+            height: 16px;
+            accent-color: #00e5ff;
+        }
+
+        .submit {
+            height: 52px;
+            margin-top: 4px;
+            background: #00e5ff;
+            color: #000;
+            border: none;
+            border-radius: 2px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .submit:hover {
+            background: #7df3ff;
+        }
+
+        .submit:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .form-message {
+            min-height: 1.2em;
+            font-size: 0.85rem;
+            text-align: center;
+            color: #ff6b6b;
+        }
+
+        .form-message.info {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .switch {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.02em;
+            text-align: center;
+        }
+
+        .switch a {
+            font-weight: 500;
+        }
+
+        footer {
+            padding: 16px 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .footer-links a:hover {
+            color: #00e5ff;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 0.65rem;
+            letter-spacing: 0.06em;
+        }
+
+        @media (max-width: 600px) {
+            nav {
+                padding: 1rem 1.25rem;
+            }
+
+            .nav-logo-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            main {
+                justify-content: flex-start;
+                gap: 22px;
+                padding: 40px 24px 24px;
+            }
+
+            .logo {
+                width: 88px;
+                height: 88px;
+            }
+
+            .divider {
+                width: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-logo">
+            <div class="nav-logo-icon"><img src="src/black_katt_transparent.png" alt="Black Katt Logo"></div>
+            Black Katt
+        </a>
+        <a href="mailto:britt@blackkatt.ca?subject=Black%20Katt%20%E2%80%94%20General%20Inquiry" class="contact-link">Contact Us</a>
+    </nav>
+    <main>
+        <img class="logo" src="src/black_katt_transparent.png" alt="">
+        <div class="divider"></div>
+        <div class="heading">
+            <h1>Sign In</h1>
+            <p class="subtitle">Welcome back</p>
+        </div>
+        <form id="sign-in-form" novalidate>
+            <label class="field" for="email">
+                <span class="field-label">Email</span>
+                <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+            </label>
+            <div class="field">
+                <div class="label-row">
+                    <label class="field-label" for="password">Password</label>
+                    <a href="#" id="forgot-password">Forgot password?</a>
+                </div>
+                <div class="password-wrap">
+                    <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+                    <button type="button" class="toggle-password" aria-label="Show password" aria-pressed="false" aria-controls="password">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+            </div>
+            <label class="checkbox" for="remember">
+                <input id="remember" name="remember" type="checkbox">
+                Keep me signed in
+            </label>
+            <button type="submit" class="submit">Sign In</button>
+            <p class="form-message" role="status" aria-live="polite"></p>
+        </form>
+        <p class="switch">New to Black Katt? <a href="sign-up.html">Create an account</a></p>
+    </main>
+    <footer>
+        <div class="footer-links">
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="terms-of-service.html">Terms of Service</a>
+        </div>
+        <p class="copyright">&copy; 2026 Black Katt Technologies Inc. All rights reserved. Black Katt&trade; is a trademark of Black Katt Technologies Inc.</p>
+    </footer>
+    <script type="module">
+        import {
+            browserLocalPersistence,
+            browserSessionPersistence,
+            sendPasswordResetEmail,
+            setPersistence,
+            signInWithEmailAndPassword,
+        } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+        import { auth, authErrorMessage } from './src/firebase.js';
+
+        document.querySelectorAll('.toggle-password').forEach((button) => {
+            button.addEventListener('click', () => {
+                const input = document.getElementById(button.getAttribute('aria-controls'));
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                button.setAttribute('aria-pressed', String(show));
+                button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            });
+        });
+
+        const form = document.getElementById('sign-in-form');
+        const message = form.querySelector('.form-message');
+        const submit = form.querySelector('.submit');
+
+        function showMessage(text, isInfo = false) {
+            message.className = isInfo ? 'form-message info' : 'form-message';
+            message.textContent = text;
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = form.email;
+            const password = form.password;
+
+            email.setAttribute('aria-invalid', String(!email.checkValidity()));
+            password.setAttribute('aria-invalid', String(!password.value));
+            showMessage('');
+
+            if (!email.checkValidity()) {
+                showMessage('Please enter a valid email address.');
+                email.focus();
+                return;
+            }
+            if (!password.value) {
+                showMessage('Please enter your password.');
+                password.focus();
+                return;
+            }
+
+            submit.disabled = true;
+            try {
+                await setPersistence(auth, form.remember.checked ? browserLocalPersistence : browserSessionPersistence);
+                const { user } = await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
+                showMessage(`Signed in as ${user.email}.`, true);
+                form.reset();
+            } catch (error) {
+                showMessage(authErrorMessage(error));
+            } finally {
+                submit.disabled = false;
+            }
+        });
+
+        document.getElementById('forgot-password').addEventListener('click', async (event) => {
+            event.preventDefault();
+            const email = form.email;
+            if (!email.checkValidity() || !email.value) {
+                email.setAttribute('aria-invalid', 'true');
+                showMessage('Enter your email above, then choose "Forgot password?" again.');
+                email.focus();
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email.value.trim());
+                showMessage(`If an account exists for ${email.value.trim()}, a reset link is on its way.`, true);
+            } catch (error) {
+                showMessage(authErrorMessage(error));
+            }
+        });
+    </script>
+</body>
+</html>
