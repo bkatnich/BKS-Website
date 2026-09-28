@@ -252,8 +252,18 @@
         }
 
         .submit:disabled {
-            opacity: 0.6;
-            cursor: wait;
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .field-error {
+            font-size: 0.75rem;
+            color: #ff6b6b;
+            letter-spacing: 0.02em;
+        }
+
+        .field-error:empty {
+            display: none;
         }
 
         .form-message {
@@ -352,10 +362,11 @@
             <p class="subtitle">Welcome back</p>
         </div>
         <form id="sign-in-form" method="post" action="#" novalidate>
-            <label class="field" for="email">
-                <span class="field-label">Email</span>
-                <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-            </label>
+            <div class="field">
+                <label class="field-label" for="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" aria-describedby="email-error" required>
+                <p class="field-error" id="email-error"></p>
+            </div>
             <div class="field">
                 <div class="label-row">
                     <label class="field-label" for="password">Password</label>
@@ -414,48 +425,67 @@
         const form = document.getElementById('sign-in-form');
         const message = form.querySelector('.form-message');
         const submit = form.querySelector('.submit');
+        const { email, password } = form;
+
+        const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailError = document.getElementById('email-error');
+        let emailTouched = false;
+        let submitting = false;
+
+        function emailValid() {
+            return EMAIL_PATTERN.test(email.value.trim());
+        }
+
+        function allValid() {
+            return emailValid() && password.value !== '';
+        }
+
+        function update() {
+            const showEmailError = emailTouched && !emailValid();
+            email.setAttribute('aria-invalid', String(showEmailError));
+            emailError.textContent = showEmailError ? 'Please enter a valid email address.' : '';
+            submit.disabled = submitting || !allValid();
+        }
 
         function showMessage(text, isInfo = false) {
             message.className = isInfo ? 'form-message info' : 'form-message';
             message.textContent = text;
         }
 
+        form.addEventListener('input', update);
+        form.addEventListener('change', update);
+        email.addEventListener('blur', () => {
+            if (email.value !== '') {
+                emailTouched = true;
+                update();
+            }
+        });
+
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
-            const email = form.email;
-            const password = form.password;
+            if (submitting || !allValid()) {
+                return;
+            }
 
-            email.setAttribute('aria-invalid', String(!email.checkValidity()));
-            password.setAttribute('aria-invalid', String(!password.value));
+            submitting = true;
             showMessage('');
-
-            if (!email.checkValidity()) {
-                showMessage('Please enter a valid email address.');
-                email.focus();
-                return;
-            }
-            if (!password.value) {
-                showMessage('Please enter your password.');
-                password.focus();
-                return;
-            }
-
-            submit.disabled = true;
+            update();
             try {
                 await setPersistence(auth, form.remember.checked ? browserLocalPersistence : browserSessionPersistence);
                 await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
                 window.location.assign('account.html');
             } catch (error) {
                 showMessage(authErrorMessage(error));
-                submit.disabled = false;
+                submitting = false;
+                update();
             }
         });
 
         document.getElementById('forgot-password').addEventListener('click', async (event) => {
             event.preventDefault();
-            const email = form.email;
-            if (!email.checkValidity() || !email.value) {
-                email.setAttribute('aria-invalid', 'true');
+            if (!emailValid()) {
+                emailTouched = true;
+                update();
                 showMessage('Enter your email above, then choose "Forgot password?" again.');
                 email.focus();
                 return;
@@ -468,8 +498,9 @@
             }
         });
 
-        // Only allow submitting once the handlers above are attached.
-        submit.disabled = false;
+        // Browsers may autofill before any input event fires.
+        update();
+        window.addEventListener('pageshow', update);
     </script>
 </body>
 </html>

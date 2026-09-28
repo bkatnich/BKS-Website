@@ -252,8 +252,8 @@
         }
 
         .submit:disabled {
-            opacity: 0.6;
-            cursor: wait;
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
         .form-message {
@@ -341,11 +341,53 @@
             gap: 16px;
         }
 
-        .hint {
+        .field-error {
+            min-height: 0;
+            font-size: 0.75rem;
+            color: #ff6b6b;
+            letter-spacing: 0.02em;
+        }
+
+        .field-error:empty {
+            display: none;
+        }
+
+        .requirements {
             margin-top: -6px;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 18px;
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.55);
             letter-spacing: 0.02em;
+        }
+
+        .requirements li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .requirements li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+        }
+
+        .requirements li.met {
+            color: #00e5ff;
+        }
+
+        .requirements li.met::before {
+            background: currentColor;
+        }
+
+        .requirements li.unmet {
+            color: #ff6b6b;
         }
 
         .checkbox.terms {
@@ -356,10 +398,6 @@
         .checkbox.terms input {
             margin-top: 2px;
             flex-shrink: 0;
-        }
-
-        .checkbox.terms.invalid {
-            color: #ff6b6b;
         }
 
         @media (max-width: 600px) {
@@ -385,14 +423,16 @@
             <p class="subtitle">Join Black Katt</p>
         </div>
         <form id="sign-up-form" method="post" action="#" novalidate>
-            <label class="field" for="name">
-                <span class="field-label">Full name</span>
-                <input id="name" name="name" type="text" placeholder="Your name" autocomplete="name" required>
-            </label>
-            <label class="field" for="email">
-                <span class="field-label">Email</span>
-                <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-            </label>
+            <div class="field">
+                <label class="field-label" for="name">Full name</label>
+                <input id="name" name="name" type="text" placeholder="Your name" autocomplete="name" aria-describedby="name-error" required>
+                <p class="field-error" id="name-error"></p>
+            </div>
+            <div class="field">
+                <label class="field-label" for="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" aria-describedby="email-error" required>
+                <p class="field-error" id="email-error"></p>
+            </div>
             <div class="field-row">
                 <div class="field">
                     <label class="field-label" for="password">Password</label>
@@ -403,12 +443,17 @@
                         </button>
                     </div>
                 </div>
-                <label class="field" for="confirm">
-                    <span class="field-label">Confirm password</span>
-                    <input id="confirm" name="confirm" type="password" placeholder="••••••••" autocomplete="new-password" required>
-                </label>
+                <div class="field">
+                    <label class="field-label" for="confirm">Confirm password</label>
+                    <input id="confirm" name="confirm" type="password" placeholder="••••••••" autocomplete="new-password" aria-describedby="confirm-error" required>
+                    <p class="field-error" id="confirm-error"></p>
+                </div>
             </div>
-            <p class="hint" id="password-hint">At least 8 characters, with a number and a symbol.</p>
+            <ul class="requirements" id="password-hint" aria-label="Password requirements">
+                <li data-rule="length">At least 8 characters</li>
+                <li data-rule="number">A number</li>
+                <li data-rule="symbol">A symbol</li>
+            </ul>
             <label class="checkbox terms" for="terms">
                 <input id="terms" name="terms" type="checkbox" required>
                 <span>I agree to the <a href="terms-of-service.html">Terms of Service</a> and <a href="privacy-policy.html">Privacy Policy</a></span>
@@ -445,44 +490,69 @@
 
         const form = document.getElementById('sign-up-form');
         const message = form.querySelector('.form-message');
-        const termsLabel = form.querySelector('.checkbox.terms');
+        const submit = form.querySelector('.submit');
+        const { name, email, password, confirm, terms } = form;
+        const requirements = form.querySelectorAll('.requirements li');
 
-        function isStrongPassword(value) {
-            return value.length >= 8 && /\d/.test(value) && /[^A-Za-z0-9]/.test(value);
+        const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordRules = {
+            length: (value) => value.length >= 8,
+            number: (value) => /\d/.test(value),
+            symbol: (value) => /[^A-Za-z0-9]/.test(value),
+        };
+
+        // Each text field: how to validate it and what to say when it's wrong.
+        const fields = [
+            { input: name, valid: () => name.value.trim() !== '', error: 'Please enter your name.' },
+            { input: email, valid: () => EMAIL_PATTERN.test(email.value.trim()), error: 'Please enter a valid email address.' },
+            { input: password, valid: () => Object.values(passwordRules).every((rule) => rule(password.value)) },
+            { input: confirm, valid: () => confirm.value !== '' && confirm.value === password.value, error: 'Passwords do not match.' },
+        ];
+        const touched = new Set();
+        let submitting = false;
+
+        function allValid() {
+            return fields.every((field) => field.valid()) && terms.checked;
         }
 
-        const submit = form.querySelector('.submit');
+        function update() {
+            fields.forEach((field) => {
+                const showError = touched.has(field.input) && !field.valid();
+                field.input.setAttribute('aria-invalid', String(showError));
+                const errorEl = document.getElementById(`${field.input.id}-error`);
+                if (errorEl) {
+                    errorEl.textContent = showError ? field.error : '';
+                }
+            });
+
+            requirements.forEach((item) => {
+                const met = passwordRules[item.dataset.rule](password.value);
+                item.classList.toggle('met', met);
+                item.classList.toggle('unmet', !met && touched.has(password));
+            });
+
+            submit.disabled = submitting || !allValid();
+        }
+
+        form.addEventListener('input', update);
+        form.addEventListener('change', update);
+        form.addEventListener('focusout', (event) => {
+            if (fields.some((field) => field.input === event.target) && event.target.value !== '') {
+                touched.add(event.target);
+                update();
+            }
+        });
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
-            const { name, email, password, confirm, terms } = form;
+            if (submitting || !allValid()) {
+                return;
+            }
 
-            const checks = [
-                [name, name.value.trim() !== '', 'Please enter your name.'],
-                [email, email.checkValidity(), 'Please enter a valid email address.'],
-                [password, isStrongPassword(password.value), 'Password must be at least 8 characters, with a number and a symbol.'],
-                [confirm, confirm.value === password.value && confirm.value !== '', 'Passwords do not match.'],
-            ];
-
+            submitting = true;
             message.className = 'form-message';
             message.textContent = '';
-            termsLabel.classList.remove('invalid');
-            checks.forEach(([input, valid]) => input.setAttribute('aria-invalid', String(!valid)));
-
-            const failed = checks.find(([, valid]) => !valid);
-            if (failed) {
-                message.textContent = failed[2];
-                failed[0].focus();
-                return;
-            }
-            if (!terms.checked) {
-                termsLabel.classList.add('invalid');
-                message.textContent = 'Please agree to the Terms of Service and Privacy Policy.';
-                terms.focus();
-                return;
-            }
-
-            submit.disabled = true;
+            update();
             try {
                 const { user } = await createUserWithEmailAndPassword(auth, email.value.trim(), password.value);
                 // The account exists at this point; the account page can resend verification if this fails.
@@ -493,12 +563,14 @@
                 window.location.assign('account.html');
             } catch (error) {
                 message.textContent = authErrorMessage(error);
-                submit.disabled = false;
+                submitting = false;
+                update();
             }
         });
 
-        // Only allow submitting once the handlers above are attached.
-        submit.disabled = false;
+        // Browsers may autofill before any input event fires.
+        update();
+        window.addEventListener('pageshow', update);
     </script>
 </body>
 </html>
