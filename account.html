@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Black Katt — Create Account</title>
+    <title>Black Katt — Account</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -127,7 +127,7 @@
 
         form {
             width: 100%;
-            max-width: 440px;
+            max-width: 400px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -335,38 +335,113 @@
             }
         }
 
-        .field-row {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
+        .account {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-top: 8px;
         }
 
-        .hint {
-            margin-top: -6px;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.55);
-            letter-spacing: 0.02em;
+        .account[hidden] {
+            display: none;
         }
 
-        .checkbox.terms {
-            align-items: flex-start;
-            line-height: 1.5;
+        .details {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 2px;
+            background: #0b0b0b;
         }
 
-        .checkbox.terms input {
-            margin-top: 2px;
-            flex-shrink: 0;
+        .detail {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 16px 20px;
         }
 
-        .checkbox.terms.invalid {
-            color: #ff6b6b;
+        .detail + .detail {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        @media (max-width: 600px) {
-            .field-row {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+        .detail dd {
+            font-size: 1rem;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffb020;
+        }
+
+        .badge.verified::before {
+            background: #00e5ff;
+        }
+
+        .text-button {
+            background: none;
+            border: none;
+            padding: 0;
+            min-height: 32px;
+            color: #00e5ff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+        }
+
+        .text-button:hover {
+            color: #7df3ff;
+        }
+
+        .text-button:disabled {
+            color: rgba(255, 255, 255, 0.4);
+            cursor: default;
+        }
+
+        .secondary {
+            height: 52px;
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .secondary:hover {
+            border-color: #00e5ff;
+            color: #00e5ff;
+        }
+
+        .loading {
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
@@ -381,42 +456,31 @@
     <main>
         <div class="divider"></div>
         <div class="heading">
-            <h1>Create Account</h1>
-            <p class="subtitle">Join Black Katt</p>
+            <h1>Account</h1>
+            <p class="subtitle" id="greeting">&nbsp;</p>
         </div>
-        <form id="sign-up-form" novalidate>
-            <label class="field" for="name">
-                <span class="field-label">Full name</span>
-                <input id="name" name="name" type="text" placeholder="Your name" autocomplete="name" required>
-            </label>
-            <label class="field" for="email">
-                <span class="field-label">Email</span>
-                <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-            </label>
-            <div class="field-row">
-                <div class="field">
-                    <label class="field-label" for="password">Password</label>
-                    <div class="password-wrap">
-                        <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="new-password" aria-describedby="password-hint" required>
-                        <button type="button" class="toggle-password" aria-label="Show password" aria-pressed="false" aria-controls="password">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
+        <p class="loading" id="loading">Loading…</p>
+        <section class="account" id="account" hidden>
+            <dl class="details">
+                <div class="detail">
+                    <dt class="field-label">Name</dt>
+                    <dd id="account-name"></dd>
                 </div>
-                <label class="field" for="confirm">
-                    <span class="field-label">Confirm password</span>
-                    <input id="confirm" name="confirm" type="password" placeholder="••••••••" autocomplete="new-password" required>
-                </label>
-            </div>
-            <p class="hint" id="password-hint">At least 8 characters, with a number and a symbol.</p>
-            <label class="checkbox terms" for="terms">
-                <input id="terms" name="terms" type="checkbox" required>
-                <span>I agree to the <a href="terms-of-service.html">Terms of Service</a> and <a href="privacy-policy.html">Privacy Policy</a></span>
-            </label>
-            <button type="submit" class="submit">Create Account</button>
+                <div class="detail">
+                    <dt class="field-label">Email</dt>
+                    <dd id="account-email"></dd>
+                </div>
+                <div class="detail">
+                    <dt class="field-label">Email status</dt>
+                    <dd class="status">
+                        <span class="badge" id="verified-badge"></span>
+                        <button type="button" class="text-button" id="resend">Resend verification email</button>
+                    </dd>
+                </div>
+            </dl>
+            <button type="button" class="secondary" id="sign-out">Sign Out</button>
             <p class="form-message" role="status" aria-live="polite"></p>
-        </form>
-        <p class="switch">Already have an account? <a href="sign-in.html">Sign in</a></p>
+        </section>
     </main>
     <footer>
         <div class="footer-links">
@@ -427,73 +491,65 @@
     </footer>
     <script type="module">
         import {
-            createUserWithEmailAndPassword,
+            onAuthStateChanged,
             sendEmailVerification,
-            updateProfile,
+            signOut,
         } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
         import { auth, authErrorMessage } from './src/firebase.js';
 
-        document.querySelectorAll('.toggle-password').forEach((button) => {
-            button.addEventListener('click', () => {
-                const input = document.getElementById(button.getAttribute('aria-controls'));
-                const show = input.type === 'password';
-                input.type = show ? 'text' : 'password';
-                button.setAttribute('aria-pressed', String(show));
-                button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-            });
-        });
+        const message = document.querySelector('.form-message');
+        const resend = document.getElementById('resend');
 
-        const form = document.getElementById('sign-up-form');
-        const message = form.querySelector('.form-message');
-        const termsLabel = form.querySelector('.checkbox.terms');
-
-        function isStrongPassword(value) {
-            return value.length >= 8 && /\d/.test(value) && /[^A-Za-z0-9]/.test(value);
+        function showMessage(text, isInfo = false) {
+            message.className = isInfo ? 'form-message info' : 'form-message';
+            message.textContent = text;
         }
 
-        const submit = form.querySelector('.submit');
+        function render(user) {
+            const name = user.displayName || '';
+            document.getElementById('greeting').textContent = name ? `Welcome, ${name}` : 'Welcome';
+            document.getElementById('account-name').textContent = name || '—';
+            document.getElementById('account-email').textContent = user.email;
 
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const { name, email, password, confirm, terms } = form;
+            const badge = document.getElementById('verified-badge');
+            badge.textContent = user.emailVerified ? 'Verified' : 'Not verified';
+            badge.classList.toggle('verified', user.emailVerified);
+            resend.hidden = user.emailVerified;
 
-            const checks = [
-                [name, name.value.trim() !== '', 'Please enter your name.'],
-                [email, email.checkValidity(), 'Please enter a valid email address.'],
-                [password, isStrongPassword(password.value), 'Password must be at least 8 characters, with a number and a symbol.'],
-                [confirm, confirm.value === password.value && confirm.value !== '', 'Passwords do not match.'],
-            ];
+            document.getElementById('loading').hidden = true;
+            document.getElementById('account').hidden = false;
+        }
 
-            message.className = 'form-message';
-            message.textContent = '';
-            termsLabel.classList.remove('invalid');
-            checks.forEach(([input, valid]) => input.setAttribute('aria-invalid', String(!valid)));
-
-            const failed = checks.find(([, valid]) => !valid);
-            if (failed) {
-                message.textContent = failed[2];
-                failed[0].focus();
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.replace('sign-in.html');
                 return;
             }
-            if (!terms.checked) {
-                termsLabel.classList.add('invalid');
-                message.textContent = 'Please agree to the Terms of Service and Privacy Policy.';
-                terms.focus();
-                return;
-            }
-
-            submit.disabled = true;
             try {
-                const { user } = await createUserWithEmailAndPassword(auth, email.value.trim(), password.value);
-                // The account exists at this point; the account page can resend verification if this fails.
-                await Promise.allSettled([
-                    updateProfile(user, { displayName: name.value.trim() }),
-                    sendEmailVerification(user),
-                ]);
-                window.location.assign('account.html');
+                // Pick up a verification completed in another tab or from the email link.
+                await user.reload();
+            } catch {
+                // Fall back to the cached profile.
+            }
+            render(auth.currentUser || user);
+        });
+
+        resend.addEventListener('click', async () => {
+            resend.disabled = true;
+            try {
+                await sendEmailVerification(auth.currentUser);
+                showMessage(`Verification link sent to ${auth.currentUser.email}.`, true);
             } catch (error) {
-                message.textContent = authErrorMessage(error);
-                submit.disabled = false;
+                showMessage(authErrorMessage(error));
+                resend.disabled = false;
+            }
+        });
+
+        document.getElementById('sign-out').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                showMessage(authErrorMessage(error));
             }
         });
     </script>

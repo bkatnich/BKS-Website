@@ -394,6 +394,13 @@
         } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
         import { auth, authErrorMessage } from './src/firebase.js';
 
+        // Already signed in: go straight to the account page.
+        auth.authStateReady().then(() => {
+            if (auth.currentUser) {
+                window.location.replace('account.html');
+            }
+        });
+
         document.querySelectorAll('.toggle-password').forEach((button) => {
             button.addEventListener('click', () => {
                 const input = document.getElementById(button.getAttribute('aria-controls'));
@@ -436,12 +443,10 @@
             submit.disabled = true;
             try {
                 await setPersistence(auth, form.remember.checked ? browserLocalPersistence : browserSessionPersistence);
-                const { user } = await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
-                showMessage(`Signed in as ${user.email}.`, true);
-                form.reset();
+                await signInWithEmailAndPassword(auth, email.value.trim(), password.value);
+                window.location.assign('account.html');
             } catch (error) {
                 showMessage(authErrorMessage(error));
-            } finally {
                 submit.disabled = false;
             }
         });

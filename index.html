@@ -144,6 +144,61 @@
         .contact-link:hover {
             color: #00e5ff;
         }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .account-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 36px;
+            padding: 0 1rem;
+            border: 1px solid #00e5ff;
+            border-radius: 2px;
+            color: #00e5ff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .account-link:hover {
+            background: #00e5ff;
+            color: #000;
+        }
+
+        @media (max-width: 480px) {
+            nav {
+                padding: 1rem 1.25rem;
+            }
+
+            .nav-logo {
+                gap: 0.5rem;
+                font-size: 1rem;
+            }
+
+            .nav-logo-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .nav-links {
+                gap: 0.875rem;
+            }
+
+            .contact-link,
+            .account-link {
+                font-size: 0.7rem;
+            }
+
+            .account-link {
+                padding: 0 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -152,7 +207,10 @@
             <div class="nav-logo-icon"><img src="src/black_katt_transparent.png" alt="Black Katt Logo"></div>
             Black Katt
         </a>
-        <a href="mailto:britt@blackkatt.ca?subject=Black%20Katt%20%E2%80%94%20General%20Inquiry" class="contact-link">Contact Us</a>
+        <div class="nav-links">
+            <a href="mailto:britt@blackkatt.ca?subject=Black%20Katt%20%E2%80%94%20General%20Inquiry" class="contact-link">Contact Us</a>
+            <a href="sign-in.html" class="account-link" id="account-link">Sign In</a>
+        </div>
     </nav>
     <div class="container">
         <img class="logo" src="src/black_katt_transparent.png" alt="Black Katt Logo">
@@ -167,5 +225,15 @@
         </div>
         <p class="copyright">&copy; 2026 Black Katt Technologies Inc. All rights reserved. Black Katt&trade; is a trademark of Black Katt Technologies Inc.</p>
     </footer>
+    <script type="module">
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+        import { auth } from './src/firebase.js';
+
+        onAuthStateChanged(auth, (user) => {
+            const link = document.getElementById('account-link');
+            link.textContent = user ? 'Account' : 'Sign In';
+            link.href = user ? 'account.html' : 'sign-in.html';
+        });
+    </script>
 </body>
 </html>
