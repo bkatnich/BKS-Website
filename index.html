@@ -171,6 +171,21 @@
             color: #000;
         }
 
+        .account-link.primary {
+            background: #00e5ff;
+            color: #000;
+            font-weight: 500;
+        }
+
+        .account-link.primary:hover {
+            background: #7df3ff;
+            border-color: #7df3ff;
+        }
+
+        .account-link[hidden] {
+            display: none;
+        }
+
         @media (max-width: 480px) {
             nav {
                 padding: 1rem 1.25rem;
@@ -190,9 +205,14 @@
                 gap: 0.875rem;
             }
 
+            .nav-logo-text {
+                display: none;
+            }
+
             .contact-link,
             .account-link {
                 font-size: 0.7rem;
+                white-space: nowrap;
             }
 
             .account-link {
@@ -205,11 +225,12 @@
     <nav>
         <a href="#" class="nav-logo">
             <div class="nav-logo-icon"><img src="src/black_katt_transparent.png" alt="Black Katt Logo"></div>
-            Black Katt
+            <span class="nav-logo-text">Black Katt</span>
         </a>
         <div class="nav-links">
             <a href="mailto:britt@blackkatt.ca?subject=Black%20Katt%20%E2%80%94%20General%20Inquiry" class="contact-link">Contact Us</a>
             <a href="sign-in.html" class="account-link" id="account-link">Sign In</a>
+            <a href="sign-up.html" class="account-link primary" id="sign-up-link">Sign Up</a>
         </div>
     </nav>
     <div class="container">
@@ -233,6 +254,7 @@
             const link = document.getElementById('account-link');
             link.textContent = user ? 'Account' : 'Sign In';
             link.href = user ? 'account.html' : 'sign-in.html';
+            document.getElementById('sign-up-link').hidden = Boolean(user);
         });
     </script>
 </body>
