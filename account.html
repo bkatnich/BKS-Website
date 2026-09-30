@@ -502,6 +502,77 @@
             display: none;
         }
 
+        .panel {
+            max-width: none;
+            margin-top: 0;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 2px;
+            background: #0b0b0b;
+        }
+
+        .panel[hidden] {
+            display: none;
+        }
+
+        .danger-zone .panel {
+            padding: 0;
+            border: none;
+            background: none;
+        }
+
+        .field-error {
+            font-size: 0.75rem;
+            color: #ff6b6b;
+            letter-spacing: 0.02em;
+        }
+
+        .field-error:empty {
+            display: none;
+        }
+
+        .requirements {
+            margin-top: -6px;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.55);
+            letter-spacing: 0.02em;
+        }
+
+        .requirements li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .requirements li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+        }
+
+        .requirements li.met {
+            color: #00e5ff;
+        }
+
+        .requirements li.met::before {
+            background: currentColor;
+        }
+
+        .requirements li.unmet {
+            color: #ff6b6b;
+        }
+
+        .text-button[hidden] {
+            display: none;
+        }
+
         .loading {
             font-size: 0.85rem;
             letter-spacing: 0.06em;
@@ -533,7 +604,10 @@
                 </div>
                 <div class="detail">
                     <dt class="field-label">Email</dt>
-                    <dd id="account-email"></dd>
+                    <dd class="status">
+                        <span id="account-email"></span>
+                        <button type="button" class="text-button" data-panel="email-form" aria-controls="email-form" aria-expanded="false" aria-label="Change email">Change</button>
+                    </dd>
                 </div>
                 <div class="detail">
                     <dt class="field-label">Email status</dt>
@@ -542,20 +616,71 @@
                         <button type="button" class="text-button" id="resend">Resend verification email</button>
                     </dd>
                 </div>
+                <div class="detail">
+                    <dt class="field-label">Password</dt>
+                    <dd class="status">
+                        <span aria-label="Hidden">••••••••</span>
+                        <button type="button" class="text-button" data-panel="password-form" aria-controls="password-form" aria-expanded="false" aria-label="Change password">Change</button>
+                    </dd>
+                </div>
             </dl>
+            <form class="panel" id="email-form" method="post" novalidate hidden>
+                <p class="warning">We&rsquo;ll send a link to your new address. Your email changes once you open it, and you&rsquo;ll then sign in again with the new address.</p>
+                <div class="field">
+                    <label class="field-label" for="new-email">New email</label>
+                    <input type="email" id="new-email" name="email" placeholder="you@example.com" autocomplete="email" aria-describedby="new-email-error" required>
+                    <p class="field-error" id="new-email-error"></p>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="email-password">Current password</label>
+                    <input type="password" id="email-password" name="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="submit" disabled>Send Verification Link</button>
+                <button type="button" class="text-button panel-cancel">Cancel</button>
+                <p class="form-message" role="status" aria-live="polite"></p>
+            </form>
+            <form class="panel" id="password-form" method="post" novalidate hidden>
+                <div class="field">
+                    <label class="field-label" for="current-password">Current password</label>
+                    <input type="password" id="current-password" name="current" autocomplete="current-password" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="new-password">New password</label>
+                    <div class="password-wrap">
+                        <input type="password" id="new-password" name="password" autocomplete="new-password" aria-describedby="password-hint new-password-error" required>
+                        <button type="button" class="toggle-password" aria-label="Show password" aria-pressed="false" aria-controls="new-password">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <p class="field-error" id="new-password-error"></p>
+                </div>
+                <ul class="requirements" id="password-hint" aria-label="Password requirements">
+                    <li data-rule="length">At least 8 characters</li>
+                    <li data-rule="number">A number</li>
+                    <li data-rule="symbol">A symbol</li>
+                </ul>
+                <div class="field">
+                    <label class="field-label" for="confirm-password">Confirm new password</label>
+                    <input type="password" id="confirm-password" name="confirm" autocomplete="new-password" aria-describedby="confirm-password-error" required>
+                    <p class="field-error" id="confirm-password-error"></p>
+                </div>
+                <button type="submit" class="submit" disabled>Update Password</button>
+                <button type="button" class="text-button panel-cancel">Cancel</button>
+                <p class="form-message" role="status" aria-live="polite"></p>
+            </form>
             <button type="button" class="secondary" id="sign-out">Sign Out</button>
             <p class="form-message" id="account-message" role="status" aria-live="polite"></p>
             <div class="danger-zone">
-                <button type="button" class="text-button danger" id="delete-start" aria-controls="delete-form" aria-expanded="false">Delete account</button>
-                <form id="delete-form" method="post" novalidate hidden>
+                <button type="button" class="text-button danger" data-panel="delete-form" aria-controls="delete-form" aria-expanded="false">Delete account</button>
+                <form class="panel" id="delete-form" method="post" novalidate hidden>
                     <p class="warning">This permanently deletes your Black Katt account and signs you out. It can&rsquo;t be undone.</p>
                     <div class="field">
                         <label class="field-label" for="delete-password">Confirm with your password</label>
                         <input type="password" id="delete-password" name="password" autocomplete="current-password" required>
                     </div>
                     <button type="submit" class="delete-button" disabled>Delete Account</button>
-                    <button type="button" class="text-button" id="delete-cancel">Cancel</button>
-                    <p class="form-message" id="delete-message" role="status" aria-live="polite"></p>
+                    <button type="button" class="text-button panel-cancel">Cancel</button>
+                    <p class="form-message" role="status" aria-live="polite"></p>
                 </form>
             </div>
         </section>
@@ -579,6 +704,8 @@
             reauthenticateWithCredential,
             sendEmailVerification,
             signOut,
+            updatePassword,
+            verifyBeforeUpdateEmail,
         } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
         import { auth, authErrorMessage } from './src/firebase.js';
 
@@ -642,63 +769,173 @@
             }
         });
 
-        const deleteStart = document.getElementById('delete-start');
-        const deleteForm = document.getElementById('delete-form');
-        const deletePassword = document.getElementById('delete-password');
-        const deleteSubmit = deleteForm.querySelector('.delete-button');
-        const deleteMessage = document.getElementById('delete-message');
-        let deleting = false;
+        document.querySelectorAll('.toggle-password').forEach((button) => {
+            button.addEventListener('click', () => {
+                const input = document.getElementById(button.getAttribute('aria-controls'));
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                button.setAttribute('aria-pressed', String(show));
+                button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            });
+        });
 
-        function updateDelete() {
-            deleteSubmit.disabled = deleting || deletePassword.value === '';
+        const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordRules = {
+            length: (value) => value.length >= 8,
+            number: (value) => /\d/.test(value),
+            symbol: (value) => /[^A-Za-z0-9]/.test(value),
+        };
+
+        // Each panel is a form opened from a [data-panel] button. Every action re-checks the
+        // current password: Firebase requires a recent sign-in for these, and it confirms intent.
+        const panels = {
+            'email-form': {
+                fields: (form) => [
+                    {
+                        input: form.email,
+                        valid: () => EMAIL_PATTERN.test(form.email.value.trim())
+                            && form.email.value.trim().toLowerCase() !== auth.currentUser?.email?.toLowerCase(),
+                        error: () => (EMAIL_PATTERN.test(form.email.value.trim())
+                            ? 'This is already your email.'
+                            : 'Please enter a valid email address.'),
+                    },
+                    { input: form.password, valid: () => form.password.value !== '' },
+                ],
+                async run(form, user) {
+                    const newEmail = form.email.value.trim();
+                    await verifyBeforeUpdateEmail(user, newEmail);
+                    showMessage(`Verification link sent to ${newEmail}. Open it to finish changing your email.`, true);
+                },
+            },
+            'password-form': {
+                fields: (form) => [
+                    { input: form.current, valid: () => form.current.value !== '' },
+                    {
+                        input: form.password,
+                        valid: () => Object.values(passwordRules).every((rule) => rule(form.password.value))
+                            && form.password.value !== form.current.value,
+                        error: () => (form.password.value === form.current.value
+                            ? 'Choose a password different from your current one.'
+                            : ''),
+                    },
+                    {
+                        input: form.confirm,
+                        valid: () => form.confirm.value !== '' && form.confirm.value === form.password.value,
+                        error: () => 'Passwords do not match.',
+                    },
+                ],
+                async run(form, user) {
+                    await updatePassword(user, form.password.value);
+                    showMessage('Password updated.', true);
+                },
+            },
+            'delete-form': {
+                fields: (form) => [{ input: form.password, valid: () => form.password.value !== '' }],
+                async run(form, user) {
+                    deleted = true;
+                    try {
+                        await deleteUser(user);
+                    } catch (error) {
+                        deleted = false;
+                        throw error;
+                    }
+                    document.getElementById('account').hidden = true;
+                    document.getElementById('greeting').innerHTML = '&nbsp;';
+                    document.getElementById('deleted').hidden = false;
+                },
+            },
+        };
+
+        const errorOverrides = {
+            'auth/invalid-credential': 'Incorrect password.',
+            'auth/admin-restricted-operation': 'This change is unavailable right now. Please contact us.',
+        };
+
+        function closePanels() {
+            document.querySelectorAll('[data-panel]').forEach((start) => {
+                document.getElementById(start.dataset.panel).hidden = true;
+                start.hidden = false;
+                start.setAttribute('aria-expanded', 'false');
+            });
         }
 
-        function setDeleteOpen(open) {
-            deleteForm.hidden = !open;
-            deleteStart.hidden = open;
-            deleteStart.setAttribute('aria-expanded', String(open));
-            deletePassword.value = '';
-            showMessage('', false, deleteMessage);
-            updateDelete();
-            if (open) {
-                deletePassword.focus();
-            } else {
-                deleteStart.focus();
-            }
-        }
+        Object.entries(panels).forEach(([id, panel]) => {
+            const form = document.getElementById(id);
+            const start = document.querySelector(`[data-panel="${id}"]`);
+            const submit = form.querySelector('button[type="submit"]');
+            const formMessage = form.querySelector('.form-message');
+            const requirements = form.querySelectorAll('.requirements li');
+            const fields = panel.fields(form);
+            const touched = new Set();
+            let submitting = false;
 
-        deleteStart.addEventListener('click', () => setDeleteOpen(true));
-        document.getElementById('delete-cancel').addEventListener('click', () => setDeleteOpen(false));
-        deletePassword.addEventListener('input', updateDelete);
-
-        deleteForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            if (deleting || deletePassword.value === '') {
-                return;
+            function update() {
+                fields.forEach((field) => {
+                    const errorEl = document.getElementById(`${field.input.id}-error`);
+                    const showError = touched.has(field.input) && !field.valid();
+                    field.input.setAttribute('aria-invalid', String(showError));
+                    if (errorEl) {
+                        errorEl.textContent = showError && field.error ? field.error() : '';
+                    }
+                });
+                requirements.forEach((item) => {
+                    const met = passwordRules[item.dataset.rule](form.password.value);
+                    item.classList.toggle('met', met);
+                    item.classList.toggle('unmet', !met && touched.has(form.password));
+                });
+                submit.disabled = submitting || !fields.every((field) => field.valid());
             }
 
-            deleting = true;
-            showMessage('', false, deleteMessage);
-            updateDelete();
-            const user = auth.currentUser;
-            try {
-                // Firebase requires a recent sign-in to delete; re-checking the password also confirms intent.
-                await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, deletePassword.value));
-                deleted = true;
-                await deleteUser(user);
-                document.getElementById('account').hidden = true;
-                document.getElementById('greeting').innerHTML = '&nbsp;';
-                document.getElementById('deleted').hidden = false;
-            } catch (error) {
-                deleted = false;
-                const text = {
-                    'auth/invalid-credential': 'Incorrect password.',
-                    'auth/admin-restricted-operation': 'Account deletion is unavailable right now. Please contact us.',
-                }[error.code] || authErrorMessage(error);
-                showMessage(text, false, deleteMessage);
-                deleting = false;
-                updateDelete();
-            }
+            start.addEventListener('click', () => {
+                closePanels();
+                form.reset();
+                touched.clear();
+                showMessage('', false, formMessage);
+                showMessage('');
+                update();
+                form.hidden = false;
+                start.hidden = true;
+                start.setAttribute('aria-expanded', 'true');
+                form.querySelector('input').focus();
+            });
+
+            form.querySelector('.panel-cancel').addEventListener('click', () => {
+                closePanels();
+                start.focus();
+            });
+
+            form.addEventListener('input', update);
+            form.addEventListener('focusout', (event) => {
+                if (fields.some((field) => field.input === event.target) && event.target.value !== '') {
+                    touched.add(event.target);
+                    update();
+                }
+            });
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                if (submitting || !fields.every((field) => field.valid())) {
+                    return;
+                }
+
+                submitting = true;
+                showMessage('', false, formMessage);
+                update();
+                const user = auth.currentUser;
+                const currentPassword = (form.current || form.password).value;
+                try {
+                    await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword));
+                    await panel.run(form, user);
+                    if (!deleted) {
+                        closePanels();
+                        start.focus();
+                    }
+                } catch (error) {
+                    showMessage(errorOverrides[error.code] || authErrorMessage(error), false, formMessage);
+                }
+                submitting = false;
+                update();
+            });
         });
     </script>
 </body>
