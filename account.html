@@ -437,6 +437,71 @@
             color: #00e5ff;
         }
 
+        .danger-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .danger-zone form {
+            margin-top: 0;
+        }
+
+        .text-button.danger {
+            color: #ff6b6b;
+        }
+
+        .text-button.danger:hover {
+            color: #ff9b9b;
+        }
+
+        .warning {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+
+        .delete-button {
+            height: 52px;
+            background: transparent;
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            border-radius: 2px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .delete-button:hover:not(:disabled) {
+            background: #ff6b6b;
+            color: #000;
+        }
+
+        .delete-button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .deleted {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .deleted[hidden] {
+            display: none;
+        }
+
         .loading {
             font-size: 0.85rem;
             letter-spacing: 0.06em;
@@ -479,7 +544,24 @@
                 </div>
             </dl>
             <button type="button" class="secondary" id="sign-out">Sign Out</button>
-            <p class="form-message" role="status" aria-live="polite"></p>
+            <p class="form-message" id="account-message" role="status" aria-live="polite"></p>
+            <div class="danger-zone">
+                <button type="button" class="text-button danger" id="delete-start" aria-controls="delete-form" aria-expanded="false">Delete account</button>
+                <form id="delete-form" method="post" novalidate hidden>
+                    <p class="warning">This permanently deletes your Black Katt account and signs you out. It can&rsquo;t be undone.</p>
+                    <div class="field">
+                        <label class="field-label" for="delete-password">Confirm with your password</label>
+                        <input type="password" id="delete-password" name="password" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="delete-button" disabled>Delete Account</button>
+                    <button type="button" class="text-button" id="delete-cancel">Cancel</button>
+                    <p class="form-message" id="delete-message" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+        </section>
+        <section class="deleted" id="deleted" hidden>
+            <p class="warning">Your account has been deleted.</p>
+            <a href="index.html">Return to home</a>
         </section>
     </main>
     <footer>
@@ -491,18 +573,22 @@
     </footer>
     <script type="module">
         import {
+            deleteUser,
+            EmailAuthProvider,
             onAuthStateChanged,
+            reauthenticateWithCredential,
             sendEmailVerification,
             signOut,
         } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
         import { auth, authErrorMessage } from './src/firebase.js';
 
-        const message = document.querySelector('.form-message');
+        const message = document.getElementById('account-message');
         const resend = document.getElementById('resend');
+        let deleted = false;
 
-        function showMessage(text, isInfo = false) {
-            message.className = isInfo ? 'form-message info' : 'form-message';
-            message.textContent = text;
+        function showMessage(text, isInfo = false, target = message) {
+            target.className = isInfo ? 'form-message info' : 'form-message';
+            target.textContent = text;
         }
 
         function render(user) {
@@ -521,6 +607,9 @@
         }
 
         onAuthStateChanged(auth, async (user) => {
+            if (deleted) {
+                return;
+            }
             if (!user) {
                 window.location.replace('sign-in.html');
                 return;
@@ -550,6 +639,65 @@
                 await signOut(auth);
             } catch (error) {
                 showMessage(authErrorMessage(error));
+            }
+        });
+
+        const deleteStart = document.getElementById('delete-start');
+        const deleteForm = document.getElementById('delete-form');
+        const deletePassword = document.getElementById('delete-password');
+        const deleteSubmit = deleteForm.querySelector('.delete-button');
+        const deleteMessage = document.getElementById('delete-message');
+        let deleting = false;
+
+        function updateDelete() {
+            deleteSubmit.disabled = deleting || deletePassword.value === '';
+        }
+
+        function setDeleteOpen(open) {
+            deleteForm.hidden = !open;
+            deleteStart.hidden = open;
+            deleteStart.setAttribute('aria-expanded', String(open));
+            deletePassword.value = '';
+            showMessage('', false, deleteMessage);
+            updateDelete();
+            if (open) {
+                deletePassword.focus();
+            } else {
+                deleteStart.focus();
+            }
+        }
+
+        deleteStart.addEventListener('click', () => setDeleteOpen(true));
+        document.getElementById('delete-cancel').addEventListener('click', () => setDeleteOpen(false));
+        deletePassword.addEventListener('input', updateDelete);
+
+        deleteForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (deleting || deletePassword.value === '') {
+                return;
+            }
+
+            deleting = true;
+            showMessage('', false, deleteMessage);
+            updateDelete();
+            const user = auth.currentUser;
+            try {
+                // Firebase requires a recent sign-in to delete; re-checking the password also confirms intent.
+                await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, deletePassword.value));
+                deleted = true;
+                await deleteUser(user);
+                document.getElementById('account').hidden = true;
+                document.getElementById('greeting').innerHTML = '&nbsp;';
+                document.getElementById('deleted').hidden = false;
+            } catch (error) {
+                deleted = false;
+                const text = {
+                    'auth/invalid-credential': 'Incorrect password.',
+                    'auth/admin-restricted-operation': 'Account deletion is unavailable right now. Please contact us.',
+                }[error.code] || authErrorMessage(error);
+                showMessage(text, false, deleteMessage);
+                deleting = false;
+                updateDelete();
             }
         });
     </script>
