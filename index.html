@@ -151,41 +151,6 @@
             gap: 1.5rem;
         }
 
-        .account-link {
-            display: inline-flex;
-            align-items: center;
-            min-height: 36px;
-            padding: 0 1rem;
-            border: 1px solid #00e5ff;
-            border-radius: 2px;
-            color: #00e5ff;
-            text-decoration: none;
-            font-size: 0.8rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .account-link:hover {
-            background: #00e5ff;
-            color: #000;
-        }
-
-        .account-link.primary {
-            background: #00e5ff;
-            color: #000;
-            font-weight: 500;
-        }
-
-        .account-link.primary:hover {
-            background: #7df3ff;
-            border-color: #7df3ff;
-        }
-
-        .account-link[hidden] {
-            display: none;
-        }
-
         @media (max-width: 480px) {
             nav {
                 padding: 1rem 1.25rem;
@@ -209,14 +174,9 @@
                 display: none;
             }
 
-            .contact-link,
-            .account-link {
+            .contact-link {
                 font-size: 0.7rem;
                 white-space: nowrap;
-            }
-
-            .account-link {
-                padding: 0 0.75rem;
             }
         }
     </style>
@@ -229,8 +189,6 @@
         </a>
         <div class="nav-links">
             <a href="mailto:britt@blackkatt.ca?subject=Black%20Katt%20%E2%80%94%20General%20Inquiry" class="contact-link">Contact Us</a>
-            <a href="sign-in.html" class="account-link" id="account-link">Sign In</a>
-            <a href="sign-up.html" class="account-link primary" id="sign-up-link">Sign Up</a>
         </div>
     </nav>
     <div class="container">
@@ -246,16 +204,5 @@
         </div>
         <p class="copyright">&copy; 2026 Black Katt Technologies Inc. All rights reserved. Black Katt&trade; is a trademark of Black Katt Technologies Inc.</p>
     </footer>
-    <script type="module">
-        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
-        import { auth } from './src/firebase.js';
-
-        onAuthStateChanged(auth, (user) => {
-            const link = document.getElementById('account-link');
-            link.textContent = user ? 'Account' : 'Sign In';
-            link.href = user ? 'account.html' : 'sign-in.html';
-            document.getElementById('sign-up-link').hidden = Boolean(user);
-        });
-    </script>
 </body>
 </html>
